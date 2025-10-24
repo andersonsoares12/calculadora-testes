@@ -1,0 +1,14 @@
+
+services:
+  calculadora-testes:
+    build: .
+    container_name: calculadora-testes-app
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+    networks:
+      - calculadora-network
+
+networks:
+  calculadora-network:
+    driver: bridge

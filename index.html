@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Precificação de Testes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
+        .config-section {
+            background: #f8f9fa;
+            padding: 25px 30px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .config-row {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .config-row label {
+            font-weight: 600;
+            color: #333;
+            min-width: 150px;
+        }
+        
+        .config-row input {
+            padding: 10px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1.1em;
+            width: 200px;
+            transition: border-color 0.3s;
+        }
+        
+        .config-row input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .section-header h2 {
+            font-size: 1.5em;
+        }
+        
+        .section-total {
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        thead {
+            background: #667eea;
+            color: white;
+        }
+        
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+        
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .value-cell {
+            font-weight: 600;
+            color: #667eea;
+            font-size: 1.1em;
+        }
+        
+        .summary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 30px;
+        }
+        
+        .summary h2 {
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .summary-card {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .summary-card h3 {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+        
+        .summary-card .value {
+            font-size: 2em;
+            font-weight: bold;
+        }
+        
+        .packages {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .package-card {
+            background: white;
+            color: #333;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .package-card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+        
+        .package-card .price {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #764ba2;
+            margin: 15px 0;
+        }
+        
+        .package-card .hours {
+            color: #666;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+        
+        .package-card ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .package-card li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+        
+        .package-card li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+        }
+        
+        .btn-export {
+            background: white;
+            color: #667eea;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 20px;
+        }
+        
+        .btn-export:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧪 Calculadora de Precificação de Testes</h1>
+            <p>Sistema Bre-B - Testes Unitários, Funcionais e de Integração</p>
+        </header>
+        
+        <div class="config-section">
+            <h3 style="margin-bottom: 20px; color: #667eea;">⚙️ Configurações Globais</h3>
+            <div class="config-row">
+                <label>💰 Valor Hora (R$):</label>
+                <input type="number" id="hourValue" value="78" min="0" step="0.01">
+            </div>
+            <div class="config-row">
+                <label>📊 Desconto (%): </label>
+                <input type="number" id="discount" value="0" min="0" max="100" step="1">
+            </div>
+        </div>
+        
+        <div class="content">
+            <!-- TESTES UNITÁRIOS -->
+            <div class="section">
+                <div class="section-header">
+                    <h2>🧩 Testes Unitários</h2>
+                    <span class="section-total" id="unitTotal">R$ 0,00</span>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tipo</th>
+                            <th style="width: 150px;">Horas</th>
+                            <th style="width: 150px;">Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Componentes Básicos (cards, botões, labels)</td>
+                            <td><input type="number" class="unit-hours" data-type="basic" value="24" min="0"></td>
+                            <td class="value-cell" id="unit-basic">R$ 0,00</td>
+                        </tr>
+                        <tr>
+                            <td>Componentes Intermediários (gráficos, formulários, menu)</td>
+                            <td><input type="number" class="unit-hours" data-type="intermediate" value="42" min="0"></td>
+                            <td class="value-cell" id="unit-intermediate">R$ 0,00</td>
+                        </tr>
+                        <tr>
+                            <td>Componentes Complexos (calendário, validações, notificações)</td>
+                            <td><input type="number" class="unit-hours" data-type="complex" value="52" min="0"></td>
+                            <td class="value-cell" id="unit-complex">R$ 0,00</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- TESTES FUNCIONAIS -->
+            <div class="section">
+                <div class="section-header">
+                    <h2>⚡ Testes Funcionais</h2>
+                    <span class="section-total" id="funcTotal">R$ 0,00</span>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tipo de Fluxo</th>
+                            <th style="width: 150px;">Horas</th>
+                            <th style="width: 150px;">Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Fluxos Simples (navegação, visualização, tooltips)</td>
+                            <td><input type="number" class="func-hours" data-type="simple" value="30" min="0"></td>
+                            <td class="value-cell" id="func-simple">R$ 0,00</td>
+                        </tr>
+                        <tr>
+                            <td>Fluxos Intermediários (filtros, personalização)</td>
+                            <td><input type="number" class="func-hours" data-type="intermediate" value="54" min="0"></td>
+                            <td class="value-cell" id="func-intermediate">R$ 0,00</td>
+                        </tr>
+                        <tr>
+                            <td>Fluxos Complexos (transferências completas, filtros avançados)</td>
+                            <td><input type="number" class="func-hours" data-type="complex" value="94" min="0"></td>
+                            <td class="value-cell" id="func-complex">R$ 0,00</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- TESTES DE INTEGRAÇÃO -->
+            <div class="section">
+                <div class="section-header">
+                    <h2>🔗 Testes de Integração</h2>
+                    <span class="section-total" id="intTotal">R$ 0,00</span>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tipo</th>
+                            <th style="width: 150px;">Horas</th>
+                            <th style="width: 150px;">Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Integrações API (dashboard, transações, notificações)</td>
+                            <td><input type="number" class="int-hours" data-type="api" value="48" min="0"></td>
+                            <td class="value-cell" id="int-api">R$ 0,00</td>
+                        </tr>
+                        <tr>
+                            <td>Fluxos End-to-End (jornadas completas)</td>
+                            <td><input type="number" class="int-hours" data-type="e2e" value="42" min="0"></td>
+                            <td class="value-cell" id="int-e2e">R$ 0,00</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- RESUMO -->
+            <div class="summary">
+                <h2>📊 Resumo Geral</h2>
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <h3>Total de Horas</h3>
+                        <div class="value" id="totalHours">0h</div>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Valor sem Desconto</h3>
+                        <div class="value" id="totalValueNoDiscount">R$ 0,00</div>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Desconto Aplicado</h3>
+                        <div class="value" id="discountValue">R$ 0,00</div>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Valor Final</h3>
+                        <div class="value" id="totalValue">R$ 0,00</div>
+                    </div>
+                </div>
+                
+                <h2 style="margin-top: 30px; margin-bottom: 20px;">📦 Pacotes Sugeridos</h2>
+                <div class="packages">
+                    <div class="package-card">
+                        <h3>📦 Essencial</h3>
+                        <div class="hours" id="pkgEssentialHours">200 horas</div>
+                        <div class="price" id="pkgEssentialPrice">R$ 0,00</div>
+                        <ul>
+                            <li>Testes unitários principais</li>
+                            <li>Fluxos críticos</li>
+                            <li>Cobertura ~60%</li>
+                            <li>Ideal para MVP</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="package-card">
+                        <h3>🎯 Completo</h3>
+                        <div class="hours" id="pkgCompleteHours">386 horas</div>
+                        <div class="price" id="pkgCompletePrice">R$ 0,00</div>
+                        <ul>
+                            <li>Todos testes unitários</li>
+                            <li>Todos testes funcionais</li>
+                            <li>Testes de integração</li>
+                            <li>Cobertura ~85%</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="package-card">
+                        <h3>💎 Premium</h3>
+                        <div class="hours" id="pkgPremiumHours">530 horas</div>
+                        <div class="price" id="pkgPremiumPrice">R$ 0,00</div>
+                        <ul>
+                            <li>Tudo do Completo</li>
+                            <li>Testes acessibilidade</li>
+                            <li>Testes performance</li>
+                            <li>Cobertura ~95%</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <button class="btn-export" onclick="exportData()">📥 Exportar Dados</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            }).format(value);
+        }
+        
+        function calculate() {
+            const hourValue = parseFloat(document.getElementById('hourValue').value) || 0;
+            const discount = parseFloat(document.getElementById('discount').value) || 0;
+            
+            // Testes Unitários
+            const unitBasic = parseFloat(document.querySelector('.unit-hours[data-type="basic"]').value) || 0;
+            const unitIntermediate = parseFloat(document.querySelector('.unit-hours[data-type="intermediate"]').value) || 0;
+            const unitComplex = parseFloat(document.querySelector('.unit-hours[data-type="complex"]').value) || 0;
+            
+            const unitBasicValue = unitBasic * hourValue;
+            const unitIntermediateValue = unitIntermediate * hourValue;
+            const unitComplexValue = unitComplex * hourValue;
+            const unitTotal = unitBasicValue + unitIntermediateValue + unitComplexValue;
+            
+            document.getElementById('unit-basic').textContent = formatCurrency(unitBasicValue);
+            document.getElementById('unit-intermediate').textContent = formatCurrency(unitIntermediateValue);
+            document.getElementById('unit-complex').textContent = formatCurrency(unitComplexValue);
+            document.getElementById('unitTotal').textContent = formatCurrency(unitTotal);
+            
+            // Testes Funcionais
+            const funcSimple = parseFloat(document.querySelector('.func-hours[data-type="simple"]').value) || 0;
+            const funcIntermediate = parseFloat(document.querySelector('.func-hours[data-type="intermediate"]').value) || 0;
+            const funcComplex = parseFloat(document.querySelector('.func-hours[data-type="complex"]').value) || 0;
+            
+            const funcSimpleValue = funcSimple * hourValue;
+            const funcIntermediateValue = funcIntermediate * hourValue;
+            const funcComplexValue = funcComplex * hourValue;
+            const funcTotal = funcSimpleValue + funcIntermediateValue + funcComplexValue;
+            
+            document.getElementById('func-simple').textContent = formatCurrency(funcSimpleValue);
+            document.getElementById('func-intermediate').textContent = formatCurrency(funcIntermediateValue);
+            document.getElementById('func-complex').textContent = formatCurrency(funcComplexValue);
+            document.getElementById('funcTotal').textContent = formatCurrency(funcTotal);
+            
+            // Testes de Integração
+            const intApi = parseFloat(document.querySelector('.int-hours[data-type="api"]').value) || 0;
+            const intE2e = parseFloat(document.querySelector('.int-hours[data-type="e2e"]').value) || 0;
+            
+            const intApiValue = intApi * hourValue;
+            const intE2eValue = intE2e * hourValue;
+            const intTotal = intApiValue + intE2eValue;
+            
+            document.getElementById('int-api').textContent = formatCurrency(intApiValue);
+            document.getElementById('int-e2e').textContent = formatCurrency(intE2eValue);
+            document.getElementById('intTotal').textContent = formatCurrency(intTotal);
+            
+            // Totais
+            const totalHours = unitBasic + unitIntermediate + unitComplex + funcSimple + funcIntermediate + funcComplex + intApi + intE2e;
+            const totalValueNoDiscount = unitTotal + funcTotal + intTotal;
+            const discountValue = totalValueNoDiscount * (discount / 100);
+            const totalValue = totalValueNoDiscount - discountValue;
+            
+            document.getElementById('totalHours').textContent = totalHours + 'h';
+            document.getElementById('totalValueNoDiscount').textContent = formatCurrency(totalValueNoDiscount);
+            document.getElementById('discountValue').textContent = formatCurrency(discountValue);
+            document.getElementById('totalValue').textContent = formatCurrency(totalValue);
+            
+            // Pacotes
+            const pkgEssential = 200 * hourValue * (1 - discount / 100);
+            const pkgComplete = totalValue;
+            const pkgPremium = 530 * hourValue * (1 - discount / 100);
+            
+            document.getElementById('pkgEssentialPrice').textContent = formatCurrency(pkgEssential);
+            document.getElementById('pkgCompletePrice').textContent = formatCurrency(pkgComplete);
+            document.getElementById('pkgPremiumPrice').textContent = formatCurrency(pkgPremium);
+        }
+        
+        function exportData() {
+            const data = {
+                configuracoes: {
+                    valorHora: document.getElementById('hourValue').value,
+                    desconto: document.getElementById('discount').value
+                },
+                testesUnitarios: {
+                    componentesBasicos: document.querySelector('.unit-hours[data-type="basic"]').value,
+                    componentesIntermediarios: document.querySelector('.unit-hours[data-type="intermediate"]').value,
+                    componentesComplexos: document.querySelector('.unit-hours[data-type="complex"]').value
+                },
+                testesFuncionais: {
+                    fluxosSimples: document.querySelector('.func-hours[data-type="simple"]').value,
+                    fluxosIntermediarios: document.querySelector('.func-hours[data-type="intermediate"]').value,
+                    fluxosComplexos: document.querySelector('.func-hours[data-type="complex"]').value
+                },
+                testesIntegracao: {
+                    integracoesApi: document.querySelector('.int-hours[data-type="api"]').value,
+                    fluxosE2E: document.querySelector('.int-hours[data-type="e2e"]').value
+                },
+                resumo: {
+                    totalHoras: document.getElementById('totalHours').textContent,
+                    valorSemDesconto: document.getElementById('totalValueNoDiscount').textContent,
+                    valorDesconto: document.getElementById('discountValue').textContent,
+                    valorFinal: document.getElementById('totalValue').textContent
+                }
+            };
+            
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'precificacao-testes-' + new Date().toISOString().split('T')[0] + '.json';
+            link.click();
+        }
+        
+        // Event listeners
+        document.getElementById('hourValue').addEventListener('input', calculate);
+        document.getElementById('discount').addEventListener('input', calculate);
+        
+        document.querySelectorAll('.unit-hours, .func-hours, .int-hours').forEach(input => {
+            input.addEventListener('input', calculate);
+        });
+        
+        // Cálculo inicial
+        calculate();
+    </script>
+</body>
+</html>
