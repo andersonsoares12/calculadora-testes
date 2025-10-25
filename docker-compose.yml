@@ -1,14 +1,10 @@
-
 services:
-  calculadora-testes:
+  app:
     build: .
-    container_name: calculadora-testes-app
     ports:
-      - "8080:80"
+      - "${PORT:-80}:80"
     restart: unless-stopped
-    networks:
-      - calculadora-network
-
-networks:
-  calculadora-network:
-    driver: bridge
+    environment:
+      - NODE_ENV=production
+    labels:
+      - "coolify.managed=true"
